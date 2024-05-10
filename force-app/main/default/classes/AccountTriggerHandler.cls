@@ -14,7 +14,7 @@ public with sharing class AccountTriggerHandler {
     }
 
     // TODO: Remove comments below and on line 125 to activate code
-    /*
+
     public void handleBeforeInsert(){
         if(hasRunOnce) {
             return;
@@ -122,6 +122,4 @@ public with sharing class AccountTriggerHandler {
             insert newOpportunities;
         }
     }
-    */
-    
 }
