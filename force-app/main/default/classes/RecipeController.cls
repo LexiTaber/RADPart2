@@ -19,29 +19,22 @@ public inherited sharing class RecipeController {
         return groceryList;
     }
 
-    
-
+    // scales the recipe, returns list of updated ingredient amounts based on new scale
     @AuraEnabled
-    public static List <Ingredient__c> scaleRecipeForServings (ID recipeId, Decimal desiredServings){
-        //scale the recipe, return list of updated ingredient amounts based on new scale
-        // query ingredients of the recipe
-        List <Ingredient__c> oldIngredientList = [
-            SELECT Id, Name, Measurement__c, Measurement_Type__c, Notes__c
-            FROM Ingredient__c
-            WHERE Recipe__c = :recipeId
-        ];
-        // create list to store ingredients from recipe
-        List <Ingredient__c> newIngredientList = new List <Ingredient__c>();
-        // calculate the scale amount up or down based on new servings value
-            for(Ingredient__c ing :oldIngredientList){
-                Decimal currentServings = ing.Recipe__r.Servings__c;
-                Decimal scalingFactor = desiredServings / currentServings;
-                //update the measurements based on calculated scaling factor
-                ing.Measurement__c *= scalingFactor;
-                // add upgraded ingredient to the list
-                newIngredientList.add(ing);
-            }
-            return newIngredientList;
+    public static List <Ingredient__c> scaleRecipeForServings (ID recipeId, Decimal desiredServings) {
+        // query for original servings value from recipe
+        Recipe__c r = [SELECT ID, Servings__c FROM Recipe__c WHERE ID = :recipeId];
+        // declare variable to hold original servings amount
+        Decimal currentServings = r.Servings__c;
+        // set scaling factor
+        Decimal scalingFactor = desiredServings/currentServings;
+        // get list of ingredients
+        List <Ingredient__c> ingredients = [SELECT ID, Name, Measurement__c, Measurement_Type__c, Notes__c FROM Ingredient__c WHERE Recipe__c = :recipeId];
+        // apply scaling based on new servings value
+        for (Ingredient__c i : ingredients) {
+            i.Measurement__c = i.Measurement__c*scalingFactor;   
+        }
+        return ingredients;
     }
 
     @AuraEnabled(Cacheable=true)
